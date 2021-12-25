@@ -55,6 +55,7 @@ public class Calculator implements CalculatorInterface {
     // TODO: Spaeter BitMasking verwenden (wesentlich schneller)
     @Override
     public String[] invertBinaryIP(String[] subnetBinary) {
+        String[] ar = new String[4];
 
         for (int i = 0; i < subnetBinary.length; i++) {
             StringBuilder sb = new StringBuilder(subnetBinary[i]);
@@ -68,9 +69,9 @@ public class Calculator implements CalculatorInterface {
                     sb.setCharAt(z, '1');
                 }
             }
-            subnetBinary[i] = sb.toString();
+            ar[i] = sb.toString();
         }
-        return subnetBinary;
+        return ar;
     }
 
     @Override
@@ -170,11 +171,14 @@ public class Calculator implements CalculatorInterface {
     public String[] calculateNetID(String binaryIP, String subnetBinary) {
         // TODO: Logical AND anstatt von langer if Abfrage implementieren
         StringBuilder sb = new StringBuilder();
+
         if (binaryIP.length() != subnetBinary.length()) {
             System.out.println("calcualteNetID Fehlgeschlagen wegen Length Mismatch!");
             System.exit(-1);
             return null;
-        } else {
+        }
+
+        else {
             for (int i = 0; i < binaryIP.length(); i++) {
                 if (binaryIP.charAt(i) == '1' && subnetBinary.charAt(i) == '1') {
                     sb.append('1');
@@ -187,14 +191,60 @@ public class Calculator implements CalculatorInterface {
         }
     }
 
-    // TODO: Schrittweite durch CIDR
-    //public String calculateNetID(String cidr, String ip) {
-    //    return null;
-    //}
+    // Alternative Implementierung: Schaue wichtiges Oktet an, anstatt Bits
+    @Override
+    public int[] calculateNetID(int cidr, int[] ipOctets) {
+
+        TreeMap<Integer, Integer> getOctectNumber = new TreeMap<>();
+        getOctectNumber.put(8, 0);
+        getOctectNumber.put(16, 1);
+        getOctectNumber.put(24, 2);
+        getOctectNumber.put(32, 3);
+
+        int[] netID = new int[4];
+        int wichtigesOctetSchrittweite = (int) Math.pow(2, getOctectNumber.ceilingKey(cidr) - cidr);
+        int octCounter = getOctectNumber.get((getOctectNumber.ceilingKey(cidr)));
+        int wichtigesOctet = ipOctets[octCounter];
+
+        for (int i = 0; i < ipOctets.length; i++) {
+            if (i < octCounter) {
+                netID[i] = ipOctets[i];
+            }
+            else if (i == octCounter) {
+                int next = 0;
+
+                while (next < wichtigesOctet) {
+                    next += wichtigesOctetSchrittweite;
+                } if (next == wichtigesOctet) {
+                    netID[i] = next;
+                } else {
+                    netID[i] = next - wichtigesOctetSchrittweite;
+                }
+            }
+            else {
+                netID[i] = 0;
+            }
+        }
+        return netID;
+    }
 
     @Override
-    public String broadcastIP(String netID, String invertedSubnetMask) {
-        return null;
+    public String[] determineBinaryBroadcastIP(String[] netID, String[] invertedSubnetMask) {
+        StringBuilder sb = new StringBuilder();
+
+        if (netID.length == 4 && invertedSubnetMask.length == 4) {
+            for (int i = 0; i < netID.length; i++) {
+                for (int j = 0; j < netID[i].length(); j++) {
+                    if (invertedSubnetMask[i].charAt(j) == '0' && netID[i].charAt(j) == '0') {
+                        sb.append('0');
+                    }
+                    else {
+                        sb.append('1');
+                    }
+                }
+            }
+        }
+        return sb.toString().split("(?<=\\G.{8})");
     }
 
     @Override

@@ -5,6 +5,7 @@ import Classes.Model.Console;
 import Classes.Model.Network;
 import IFaces.CalculatorInterface;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class Selector {
@@ -34,9 +35,17 @@ public class Selector {
                 );
                 network.setNetIDOctets(calc.toDecimal(network.getBinaryNetID()));
                 network.setNetID(calc.toString(network.getNetIDOctets()));
+                network.setInvertedSubnet(calc.invertBinaryIP(network.getBinarySubnet()));
+                network.setWildcardSubnet(calc.toString(calc.toDecimal(network.getInvertedSubnet())));
+                network.setBinarybroadCast(
+                        calc.determineBinaryBroadcastIP(
+                                network.getBinaryNetID(),
+                                network.getInvertedSubnet()));
+                network.setBroadCastOctets(calc.toDecimal(network.getBinarybroadCast()));
+                network.setBroadCast(calc.toString(network.getBroadCastOctets()));
 
-                // TODO: Herausfinden wieso binarySubnet sich auch nach Methode invertiert
-                //network.setInvertedSubnet(calc.invertBinaryIP(network.getBinarySubnet()));
+                //Test fuer alternative Implementierung von calculateNetID()
+                //System.out.println(Arrays.toString(calc.calculateNetID(Integer.parseInt(network.getCidr().replace("/", "")), network.getOctets())));
             }
         }
     }
@@ -71,8 +80,12 @@ public class Selector {
                             %-20s %s
                             %-20s %s
                             %-20s %s
+                            %-20s %s
+                            %-20s %s
                             
                             %35s
+                            %-20s %s
+                            %-20s %s
                             %-20s %s
                             %-20s %s
                             %-20s %d
@@ -90,15 +103,19 @@ public class Selector {
                     "++++Subnet Properties++++",
                     "CIDR:", network.getCidr(),
                     "Subnet:", network.getSubnet(),
+                    "Wildcard Subnet:", network.getWildcardSubnet(),
                     "Binary Subnet view:", Selector.printBinary(network.getBinarySubnet()),
+                    "Binary Wildcard:", Selector.printBinary(network.getInvertedSubnet()),
 
                     "++++Network Properties++++",
                     "Net ID:", network.getNetID(),
+                    "Broadcast IP:", network.getBroadCast(),
                     "Binary Net ID", Selector.printBinary(network.getBinaryNetID()),
+                    "Binary Broadcast:", Selector.printBinary(network.getBinarybroadCast()),
                     "Range:", network.getRange(),
                     "Net-Class by IP:", network.getNetClassIP(),
                     "Net-Class by Subnet:", network.getNetClassSubnet(),
-                    "Validity:", calc.checkIfValidIP(network.getOctets()));
+                    "Validity:", (calc.checkIfValidIP(network.getOctets())) && calc.checkIfValidIP(network.getSubnetOctets()));
         }
     }
 }

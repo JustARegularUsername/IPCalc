@@ -18,7 +18,9 @@ public interface CalculatorInterface {
 
     String nextNet(int[] ip, int[] subnet);
     String[] calculateNetID(String binaryIP, String subnetBinary);
-    String broadcastIP(String netID, String invertedSubnetMask);
+    int[] calculateNetID(int cidr, int[] ipOctets);
+
+    String[] determineBinaryBroadcastIP(String[] netID, String[] invertedSubnetMask);
     String[] binaryIP(int[] ip);
     String cidrNotation(String binarySubnet);
     String toMergedString(String[] binaryIp);

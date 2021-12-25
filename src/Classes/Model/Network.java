@@ -1,6 +1,5 @@
 package Classes.Model;
 
-
 import IFaces.IPInterface;
 
 public class Network implements IPInterface {
@@ -14,27 +13,22 @@ public class Network implements IPInterface {
 
     private char netClassIP;
     private char netClassSubnet;
-    private String ip;
-    private String subnet;
+    private final String ip;
+    private final String subnet;
     private String cidr;
     private String netID;
     private String broadCast;
+    private String wildcardSubnet;
     private String[] binaryIP;
     private String[] binaryNetID;
     private String[] binarybroadCast;
     private String[] binarySubnet;
     private String[] invertedSubnet;
 
+
     public Network(String subnet, String ip) {
         this.subnet = subnet;
         this.ip = ip;
-    }
-    public Network(String subnet, String ip, int[] octets, long realAddress, String cidr) {
-        this.subnet = subnet;
-        this.ip = ip;
-        this.octets = octets;
-        this.realAddress = realAddress;
-        this.cidr = cidr;
     }
 
 
@@ -79,14 +73,6 @@ public class Network implements IPInterface {
 
     public void setRealAddress(long realAddress) {
         this.realAddress = realAddress;
-    }
-
-    public void setSubnet(String subnet) {
-        this.subnet = subnet;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
     }
 
     public void setCidr(String cidr) {
@@ -182,10 +168,18 @@ public class Network implements IPInterface {
     }
 
     public String getBroadCast() {
-        return broadCast;
+        return this.broadCast;
     }
 
     public void setBroadCast(String broadCast) {
         this.broadCast = broadCast;
+    }
+
+    public String getWildcardSubnet() {
+        return wildcardSubnet;
+    }
+
+    public void setWildcardSubnet(String wildcardSubnet) {
+        this.wildcardSubnet = wildcardSubnet;
     }
 }
